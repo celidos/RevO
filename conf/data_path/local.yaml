@@ -1,0 +1,8 @@
+# @package _global_
+data:
+  megapixel_mnist_train_root: /workspace/cando-nfs/pockonechnyy/RevO/data/megapixel_mnist_data/train
+  megapixel_mnist_val_root: /workspace/cando-nfs/pockonechnyy/RevO/data/megapixel_mnist_data/val
+  megapixel_mnist_train_val_root: /workspace/cando-nfs/pockonechnyy/RevO/data/megapixel_mnist_data/train_val
+  megapixel_mnist_annotations_root: /workspace/cando-nfs/pockonechnyy/RevO/data/megapixel_mnist_data/annotations
+  megapixel_mnist_val_novel_cats_root: /workspace/cando-nfs/pockonechnyy/RevO/data/megapixel_mnist/val_novel_cats
+  megapixel_mnist_val_train_cats_root: /workspace/cando-nfs/pockonechnyy/RevO/data/megapixel_mnist/val_train_cats

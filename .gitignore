@@ -136,8 +136,8 @@ coco/
 mnist/
 
 # Configs
-conf/data_path/local.yaml
-conf/config.yaml
+#conf/data_path/local.yaml
+#conf/config.yaml
 
 # Custom
 .idea/

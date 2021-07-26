@@ -54,6 +54,8 @@ def resnet_backbone(
 
     return_layer = {returned_layer: 'output'}
 
+    print('return_layer = {}'.format(return_layer))
+    print('backbone layers = {}'.format([name for name, _ in backbone.named_children()]))
     return IntermediateLayerGetter(model=backbone, return_layers=return_layer)
 
 

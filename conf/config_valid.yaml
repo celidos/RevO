@@ -6,7 +6,7 @@ description: 'Validation'
 
 bs: 32
 desired_bs: 32
-device: cuda:0
+device: cuda:2
 path: null
 ckpt: null
 
