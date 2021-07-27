@@ -36,6 +36,7 @@ def object_from_dict(d, parent=None, ignore_keys=None, **default_kwargs):
 
 
 def flatten_dict(d, parent_key='', sep='_'):
+    print('FLATTEN Call on d =', d)
     items = []
     for k, v in d.items():
         new_key = parent_key + sep + k if parent_key else k

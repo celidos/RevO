@@ -1,3 +1,4 @@
+# +
 import os
 from collections import defaultdict
 from operator import itemgetter
@@ -6,6 +7,9 @@ import cv2
 import torch
 from torch.utils.data import Dataset
 from torch.utils.data._utils.collate import default_collate
+
+from tqdm import tqdm
+# -
 
 from utils.data import get_category_based_anns, to_yolo_target
 
@@ -54,6 +58,9 @@ class FewShotDataset(Dataset):
     def _imread(filename, flags=None):
         img = cv2.imread(filename, flags)
 
+        if img is None:
+            return None
+        
         if len(img.shape) < 3:
             img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
         else:
@@ -77,7 +84,60 @@ class ObjectDetectionDataset(FewShotDataset):
     ):
         super().__init__(q_root, s_root, q_ann_filename, s_ann_filename, k_shot,
                          q_img_size, backbone_stride, q_transform, s_transform)
+        
+        self.__preload_hard()
 
+    def __preload_hard(self):
+        print("Preloading data q...")
+        # ----------------------------
+        
+        self.cached_q_img = []
+        self.cached_q_bbox = []
+        self.cached_q_bbox_cat = []
+        tqrange = tqdm(range(len(self.q_anns)))
+        for idx in tqrange:
+            q_ann = self.q_anns[idx]
+            q_bbox = list(map(lambda ann: ann['bbox'], q_ann['anns']))
+            q_bbox_cat = list(map(lambda ann: ann['category_id'], q_ann['anns']))
+
+            q_file_name = q_ann['file_name']
+            tqrange.set_description("{}".format(os.path.basename(q_file_name).ljust(40)), refresh=True)
+            q_img = self._imread(os.path.join(self.q_root, q_file_name), cv2.COLOR_BGR2RGB)
+            if q_img is not None:
+                if self.q_transform:
+                    q_transformed = self.q_transform(image=q_img, bboxes=q_bbox, bboxes_cats=q_bbox_cat)
+                    q_img = q_transformed['image']
+                    q_bbox = list(map(list, q_transformed['bboxes']))
+            
+            self.cached_q_img.append(q_img)
+            self.cached_q_bbox.append(q_bbox)
+            self.cached_q_bbox_cat.append(q_bbox_cat)
+            
+        # -----------------------------
+        
+        self.cached_s_img = []
+        self.cached_s_bbox = []
+        self.cached_s_bbox_cat = []
+        tqrange = tqdm(range(len(self.s_anns)))
+        for idx in tqrange:
+            s_ann = self.s_anns[idx]
+            s_bbox = list(map(lambda ann: ann['bbox'], s_ann['anns']))
+            s_bbox_cat = list(map(lambda ann: ann['category_id'], s_ann['anns']))
+
+            s_file_name = s_ann['file_name']
+            tqrange.set_description("{}".format(os.path.basename(s_file_name).ljust(40)), refresh=True)
+            s_img = self._imread(os.path.join(self.s_root, s_file_name), cv2.COLOR_BGR2RGB)
+            if s_img is not None:
+                if self.s_transform:
+                    s_transformed = self.s_transform(image=s_img, bboxes=s_bbox, bboxes_cats=s_bbox_cat)
+                    s_img = s_transformed['image']
+                    s_bboxes = list(map(list, s_transformed['bboxes']))
+            
+            self.cached_s_img.append(s_img)
+            self.cached_s_bbox.append(s_bbox)
+            self.cached_s_bbox_cat.append(s_bbox_cat)
+            
+        
     def __getitem__(self, idx: int):
         """
         Returns:
@@ -88,7 +148,8 @@ class ObjectDetectionDataset(FewShotDataset):
                     sample['input']['s_bboxes'] (List[List[float]]): bbox coordinates for support images
                 sample['target'] (List[float]): target object presence map (vector actually)
         """
-        q_ann = self.q_anns[idx]
+        
+        """q_ann = self.q_anns[idx]
         q_bbox = list(map(lambda ann: ann['bbox'], q_ann['anns']))
         q_bbox_cat = list(map(lambda ann: ann['category_id'], q_ann['anns']))
 
@@ -124,7 +185,16 @@ class ObjectDetectionDataset(FewShotDataset):
                 for s_img, s_bbox, s_bbox_cat in zip(s_imgs, s_bboxes, s_bbox_cats)
             ]
             s_imgs = [transformed['image'] for transformed in s_transformed]
-            s_bboxes = [list(map(list, transformed['bboxes'])) for transformed in s_transformed]
+            s_bboxes = [list(map(list, transformed['bboxes'])) for transformed in s_transformed]"""
+        
+        q_img = self.cached_q_img[idx]
+        q_bbox = self.cached_q_bbox[idx]
+        q_bbox_cat = self.cached_q_bbox_cat[idx]
+        
+        s_anns_idxs = np.random.choice(list(self.s_anns_by_categories[q_bbox_cat[0]] - {idx}), self.k_shot)
+        s_bboxes = itemgetter(*s_anns_idxs)(self.cached_s_bbox)
+#         s_imgs = itemgetter(*s_anns_idxs)(self.cached_s_img)
+        s_imgs = [self.cached_s_img[s_idx].detach() for s_idx in s_anns_idxs]
 
         target = to_yolo_target(q_bbox, self.q_img_size, self.backbone_stride)
         sample = {'input': {}, 'target': []}

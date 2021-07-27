@@ -48,8 +48,10 @@ class State:
 
     def log_train(self):
         msg = f'Step - {self.step} '
-        for name, value in self.last_train_loss.items():
-            msg += f'{name} - {value:.7f} '
+        
+        if self.last_train_loss is not None:
+            for name, value in self.last_train_loss.items():
+                msg += f'{name} - {value:.7f} '
 
         logger.info(msg)
 
@@ -61,6 +63,7 @@ class State:
         logger.info(msg)
 
 
+# +
 class Trainer:
     def __init__(self, cfg):
         signal.signal(signal.SIGINT, self._soft_exit)
@@ -139,7 +142,19 @@ class Trainer:
         while not self.stop_condition(self.state):
             batch = self.get_train_batch()
             loss = self.run_step(batch)
-            self.state.update(loss)
+#             print('LOSS=', loss)
+#             self.state.update(loss)
+
+            self.state.update(None)
+            self.state.last_train_loss = {
+                'loss': loss['loss'].item(),
+                'loss_noobj': loss['loss_noobj'].item(),
+                'loss_bbox': loss['loss_bbox'].item(), 
+                'loss_obj': loss['loss_obj'].item()
+            }
+#             print('LAST TRAIN LOSS=', self.state.last_train_loss)
+            
+#             0 / 0
 
             self._run_callbacks()
 

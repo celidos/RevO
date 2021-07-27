@@ -57,7 +57,7 @@ optimizer:
 loss:
   type: loss.CustomYOLOLoss
   img_size: [320, 320]
-  grid_size: [32, 32]
+  grid_size: [32, 32]  # for sure? not 10 x 10 ?
   bbox_criterion:
     type: loss.EIoULoss
     reduction: sum

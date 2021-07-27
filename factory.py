@@ -91,8 +91,8 @@ def create_dataloader(cfg, dataset):
                             shuffle=shuffle,
                             sampler=sampler, 
                             collate_fn=collate_fn,
-                            num_workers=6, # added
-                            pin_memory=True  # added # TODO ADD INIT FN
+#                             num_workers=6, # added
+#                             pin_memory=True  # added # TODO ADD INIT FN
                            )
     dataloader_dict = {
         'name': cfg.name,
