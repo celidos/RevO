@@ -5,7 +5,7 @@ defaults:
 
 description: ''
 
-n_steps: 40000
+n_steps: 100 #40000
 bs: 32
 desired_bs: 32
 k_shot: 3

@@ -86,8 +86,14 @@ def create_dataloader(cfg, dataset):
         sampler = None
 
     collate_fn = object_from_dict(cfg.collate_fn)
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=shuffle,
-                            sampler=sampler, collate_fn=collate_fn)
+    dataloader = DataLoader(dataset, 
+                            batch_size=batch_size,
+                            shuffle=shuffle,
+                            sampler=sampler, 
+                            collate_fn=collate_fn,
+                            num_workers=6, # added
+                            pin_memory=True  # added # TODO ADD INIT FN
+                           )
     dataloader_dict = {
         'name': cfg.name,
         'dataloader': dataloader,
