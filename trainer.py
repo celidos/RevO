@@ -139,19 +139,24 @@ class Trainer:
 
         self._before_run_callbacks()
 
+        it = 0
         while not self.stop_condition(self.state):
             batch = self.get_train_batch()
             loss = self.run_step(batch)
 #             print('LOSS=', loss)
-#             self.state.update(loss)
+            it += 1
+            if it % 20 == 0:
+                self.state.update(loss)
+            else:
+                self.state.update(None)
 
-            self.state.update(None)
-            self.state.last_train_loss = {
-                'loss': loss['loss'].item(),
-                'loss_noobj': loss['loss_noobj'].item(),
-                'loss_bbox': loss['loss_bbox'].item(), 
-                'loss_obj': loss['loss_obj'].item()
-            }
+#             self.state.update(None)
+#             self.state.last_train_loss = {
+#                 'loss': loss['loss'].item(),
+#                 'loss_noobj': loss['loss_noobj'].item(),
+#                 'loss_bbox': loss['loss_bbox'].item(), 
+#                 'loss_obj': loss['loss_obj'].item()
+#             }
 #             print('LAST TRAIN LOSS=', self.state.last_train_loss)
             
 #             0 / 0
