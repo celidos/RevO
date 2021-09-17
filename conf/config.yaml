@@ -1,12 +1,12 @@
 defaults:
   - hydra: custom
-  - data_path: theta
+  - data_path: local
   - dataset: dataset
 
 description: ''
 
-n_steps: 40000
-bs: 32
+n_steps: 100 # 40000
+bs: 16
 desired_bs: 32
 k_shot: 3
 device: cuda:0
@@ -38,7 +38,7 @@ model:
     name: resnet50
     pretrained: true
     trainable_layers: 3
-    returned_layer: 4
+    returned_layer: layer4
     stride: 32
     norm_layer: frozen_bn
   # transformer
@@ -56,6 +56,8 @@ optimizer:
 
 loss:
   type: loss.CustomYOLOLoss
+  img_size: [320, 320]
+  grid_size: [32, 32]
   bbox_criterion:
     type: loss.EIoULoss
     reduction: sum

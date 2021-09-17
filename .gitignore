@@ -148,3 +148,5 @@ img/
 checkpoints/
 experiments/
 visualization/
+data/megapixel_mnist_data
+data/mnist_data

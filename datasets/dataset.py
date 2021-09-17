@@ -53,7 +53,7 @@ class FewShotDataset(Dataset):
     @staticmethod
     def _imread(filename, flags=None):
         img = cv2.imread(filename, flags)
-
+        # print(filename)
         if len(img.shape) < 3:
             img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
         else:
