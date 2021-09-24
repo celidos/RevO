@@ -6,7 +6,7 @@ defaults:
 description: ''
 
 n_steps: 100 # 40000
-bs: 16
+bs: 8
 desired_bs: 32
 k_shot: 3
 device: cuda:0
