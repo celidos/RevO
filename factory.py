@@ -1,7 +1,8 @@
 import torch
 from utils.utils import object_from_dict
 from torch.utils.data import DataLoader, SubsetRandomSampler
-import albumentations as albu
+import albumentations as A
+import albumentations.pytorch
 import numpy as np
 
 
@@ -117,10 +118,12 @@ def create_callbacks(cfg, trainer):
 
 
 def create_augmentations(cfg):
-    augmentations = []
-    for augm in cfg:
-        augmentations.append(object_from_dict(augm))
+    print(type(cfg))
 
-    transform = albu.Compose(augmentations,
-                             bbox_params=albu.BboxParams(format='coco', label_fields=['bboxes_cats']))
+    transform = A.Compose([
+        A.Resize(cfg['resize_height'], cfg['resize_width']),
+        A.Normalize(),
+        albumentations.pytorch.transforms.ToTensorV2()
+    ], bbox_params=A.BboxParams(format='coco', label_fields=['bboxes_cats']))
+
     return transform

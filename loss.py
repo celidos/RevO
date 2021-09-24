@@ -230,6 +230,10 @@ class CustomYOLOLoss(torch.nn.Module):
         '''
         """
 
+        print('-'*80)
+        print('input', input.shape)
+        print('tgt  ', target.shape)
+
         n_bboxes = input.shape[-1] // 5
         obj_mask = target[..., 0] > 0
         n_obj_cells = obj_mask.sum()

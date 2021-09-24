@@ -48,7 +48,7 @@ model:
   resid_pdrop: 0.1
   embd_pdrop: 0.1
   n_layer: 1
-  out_dim: 10 # n_bboxes * 5
+  out_dim: 5 # WAS 10 # n_bboxes * 5
 
 optimizer:
   type: torch.optim.Adam
@@ -77,11 +77,8 @@ data:
   bbox_format: coco
   input_size: [320, 320]
   train_transforms:
-    - type: albumentations.Resize
-      height: ${data.input_size.0}
-      width: ${data.input_size.1}
-    - type: albumentations.Normalize
-    - type: albumentations.pytorch.transforms.ToTensorV2
+    resize_height: ${data.input_size.0}
+    resize_width: ${data.input_size.1}
 
   val_transforms:
     - type: albumentations.Resize
