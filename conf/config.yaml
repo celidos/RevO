@@ -12,24 +12,6 @@ k_shot: 3
 device: cuda:0
 amp: false
 
-metrics:
-  - type: metrics.Recall
-  - type: metrics.Precision
-  - type: metrics.AveragePrecision
-  - type: metrics.IoU
-
-hooks:
-  - type: callbacks.LogCallback
-    frequency: 20
-
-  - type: callbacks.ValidationCallback
-    frequency: 300
-
-  - type: callbacks.TensorBoardCallback
-    frequency: 20
-
-  - type: callbacks.SaveCheckpointCallback
-    frequency: 5000
 
 model:
   type: models.prikol.PrikolNet
